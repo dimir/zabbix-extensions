@@ -1,14 +1,14 @@
 {
-    "manifest_version": 1.0,
-    "id": "my-address",     
-    "name": "My IP Address",
-    "version": "1.0",       
-    "namespace": "MyAddress",
-    "description": "My External IP Address",
-    "actions": {                            
-	"my.address": {
-	    "class": "MyAddress",
-	    "view": "my.address"
+	"manifest_version": 1.0,
+	"id": "my-address",
+	"name": "My IP Address",
+	"version": "1.0",
+	"namespace": "MyAddress",
+	"description": "My External IP Address",
+	"actions": {
+		"my.address": {
+			"class": "MyAddress",
+			"view": "my.address"
+		}
 	}
-    }
 }
