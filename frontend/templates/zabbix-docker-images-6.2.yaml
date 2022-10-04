@@ -1,0 +1,207 @@
+zabbix_export:
+  version: '6.2'
+  date: '2022-10-03T11:21:41Z'
+  template_groups:
+    -
+      uuid: 64341a0dc40b4a65bb12b976bf61745d
+      name: 'Zabbix Summit 2022'
+  templates:
+    -
+      uuid: 4d480fdfd3394b258615c2a4657ca4fa
+      template: 'Template Docker Images'
+      name: 'Template Docker Images'
+      groups:
+        -
+          name: 'Zabbix Summit 2022'
+      items:
+        -
+          uuid: 705a57d6b9274719b8f4797afd6a703d
+          name: 'Get images data'
+          type: SCRIPT
+          key: get.images.data
+          delay: 10m
+          trends: '0'
+          value_type: TEXT
+          params: |
+            //
+            // Helper function that returns response in JSON format or throws an error.
+            //
+            
+            function processResponse(request, response) {
+                console.warn('[ DOCKER IMAGES ] Received response with HTTP status code ' + request.getStatus());
+            
+                if (request.getStatus() !== 200)
+                {
+                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                }
+            
+                if (response[0] === '<')
+                {
+                    try
+                    {
+                        response = XML.toJson(response);
+                    }
+                    catch (error)
+                    {
+                        throw 'Failed to parse response received from Docker Hub API. Check debug log for more information.';
+                    }
+                }
+            
+                if (response !== null)
+                {
+                    try
+                    {
+                        response = JSON.parse(response);
+                    }
+                    catch (error)
+                    {
+                        throw 'Failed to parse response received from Docker Hub API. Check debug log for more information.';
+                    }
+                }
+            
+                return response;
+            }
+            
+            //
+            // Parse item parameters and check if required macros are set.
+            //
+            
+            const params = JSON.parse(value);
+            
+            if (!params.username || !params.password)
+            {
+                throw 'Macros {\$USERNAME} and {\$PASSWORD} must be set.'
+            }
+            
+            //
+            // Log in and fetch provided access token.
+            //
+            
+            var request = new HttpRequest();
+            var url = params.url + '/users/login';
+            
+            request.addHeader('Content-Type: application/json');
+            
+            const payload = {"username":params.username,"password":params.password};
+            
+            console.warn('[ DOCKER IMAGES ] Sending request: ' + url);
+            
+            response = processResponse(request, request.post(url, JSON.stringify(payload)));
+            
+            const token = response.token;
+            
+            //
+            // Use access token to fetch images data.
+            //
+            
+            url = params.url + '/repositories/zabbix/?page_size=1000000';
+            
+            request.addHeader('Authorization: Bearer ' + token);
+            
+            console.warn('[ DOCKER IMAGES ] Sending request: ' + url);
+            
+            response = processResponse(request, request.get(url));
+            
+            console.warn('[ DOCKER IMAGES ] Got ' + response.results.length + ' images');
+            
+            //
+            // Create JSON in a format LLD rule expects it.
+            //
+            
+            var result = JSON.parse('{"data":[]}');
+            
+            for (var i = 0; i < response.results.length; i++)
+            {
+                result.data.push({
+                    "name"         : response.results[i].name,
+                    "pull_count"   : response.results[i].pull_count,
+                    "star_count"   : response.results[i].star_count,
+                    "last_updated" : response.results[i].last_updated
+                });
+            }
+            
+            return JSON.stringify(result);
+          timeout: 10s
+          parameters:
+            -
+              name: url
+              value: '{$URL}'
+            -
+              name: username
+              value: '{$USERNAME}'
+            -
+              name: password
+              value: '{$PASSWORD}'
+      discovery_rules:
+        -
+          uuid: 3b2a5e790b684ae89cd8ace4b4ba7e8c
+          name: 'Images Discovery'
+          type: DEPENDENT
+          key: images.discovery
+          delay: '0'
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 25d49632938b467592b2801fdf9291c4
+              name: '{#NAME}: Last Updated'
+              type: DEPENDENT
+              key: 'last.updated[{#NAME}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.name == "{#NAME}")].last_updated.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor(new Date(value).getTime() / 1000)'
+              master_item:
+                key: get.images.data
+            -
+              uuid: ebe0e62b0f504d4083f589b7db80b534
+              name: '{#NAME}: Pull Count'
+              type: DEPENDENT
+              key: 'pull.count[{#NAME}]'
+              delay: '0'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.name == "{#NAME}")].pull_count.first()'
+              master_item:
+                key: get.images.data
+            -
+              uuid: 9d100d53a5324f6d992ebb5afd28ce64
+              name: '{#NAME}: Star Count'
+              type: DEPENDENT
+              key: 'star.count[{#NAME}]'
+              delay: '0'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.name == "{#NAME}")].star_count.first()'
+              master_item:
+                key: get.images.data
+          master_item:
+            key: get.images.data
+          lld_macro_paths:
+            -
+              lld_macro: '{#LAST_UPDATED}'
+              path: $.last_updated
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#PULL_COUNT}'
+              path: $.pull_count
+            -
+              lld_macro: '{#STAR_COUNT}'
+              path: $.star_count
+      macros:
+        -
+          macro: '{$URL}'
+          value: 'https://hub.docker.com/v2'
+          description: 'Docker HUB API base URL'
