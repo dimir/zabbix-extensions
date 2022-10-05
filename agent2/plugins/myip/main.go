@@ -1,4 +1,4 @@
-// This is the source code of loadable plugin myip. It implements 1 metric
+// This is the source code of loadable plugin Myip. It implements 1 metric
 // called myip, which returns the external IP address of the host where
 // the agent is running.
 
