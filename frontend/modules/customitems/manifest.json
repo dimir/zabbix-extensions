@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1,
+	"id": "customitems",
+	"name": "Custom Items",
+	"author": "",
+	"description": "Show items list of multiple hosts",
+	"version": "1.0",
+	"namespace": "CustomItems",
+	"url": "",
+	"actions": {
+		"customitems": {
+			"class": "CustomItems",
+			"view": "customitems"
+		}
+	}
+}

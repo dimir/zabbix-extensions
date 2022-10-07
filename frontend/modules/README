@@ -1,3 +1,22 @@
+"My Address"
+
+This module demonstrates how to:
+
+  - create an Action and the View
+  - add menu element
+
+"Custom Items"
+
+This module demonstrates how to:
+
+  - fetch hosts and items using Zabbix PHP classes (that use Zabbix API)
+  - display data in an HTML table
+  - use multiselect HTML form element
+  - pass user data from multiselect to an action
+  - add menu element
+
+Zabbix PHP classes documentation
+
 If you want to use Zabbix PHP classes in your module you can generate phpDoc documentation
 and get at least some indexed view of those classes and their methods. Keep in mind that
 this is work in progress and not everything is described. Here's a way to do that using
