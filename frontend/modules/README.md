@@ -1,11 +1,11 @@
-"My Address"
+# ["My Address"](./my-address/)
 
 This module demonstrates how to:
 
   - create an Action and the View
   - add menu element
 
-"Custom Items"
+# ["Custom Items"](./customitems/)
 
 This module demonstrates how to:
 
@@ -15,7 +15,7 @@ This module demonstrates how to:
   - pass user data from multiselect to an action
   - add menu element
 
-Zabbix PHP classes documentation
+# Zabbix PHP classes documentation
 
 If you want to use Zabbix PHP classes in your module you can generate phpDoc documentation
 and get at least some indexed view of those classes and their methods. Keep in mind that

@@ -1,20 +1,22 @@
+# Myip plugin for Zabbix agent 2
+
 This is the source code of loadable Zabbix agent 2 plugin Myip. It implements 1 metric
-called myip, which returns the external IP address of the host where the agent is
+called `myip`, which returns the external IP address of the host where the agent is
 running. In order to build the plugin you need to be connected to the Internet.
 
-Make sure golang and make packages are installed:
+1. Make sure golang and make packages are installed:
 
     apt install golang make
 
-Build the plugin:
+1. Build the plugin:
 
     sudo make install
 
-Configure it in Zabbix agent 2:
+1. Configure it in Zabbix agent 2:
 
     echo Plugins.Myip.System.Path=/usr/local/zabbix/go/plugins/myip | sudo tee /etc/zabbix/zabbix_agent2.d/plugins.d/myip.conf
 
-Test it:
+1. Test it:
 
     zabbix_agent2 -t myip
 
