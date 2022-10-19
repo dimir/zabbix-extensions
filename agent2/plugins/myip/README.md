@@ -12,10 +12,6 @@ running. In order to build the plugin you need to be connected to the Internet.
 
        sudo make install
 
-1. Configure it in Zabbix agent 2:
-
-       echo Plugins.Myip.System.Path=/usr/local/zabbix/go/plugins/myip | sudo tee /etc/zabbix/zabbix_agent2.d/plugins.d/myip.conf
-
 1. Test it:
 
        zabbix_agent2 -t myip
