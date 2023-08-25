@@ -1,0 +1,641 @@
+NETTRACK-E3METER-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	;
+
+nettrack OBJECT IDENTIFIER
+	::= { enterprises 21695 }
+
+public OBJECT IDENTIFIER
+	::= { nettrack 1 }
+
+e3Mib
+	MODULE-IDENTITY
+	LAST-UPDATED	"201204120000Z"
+	ORGANIZATION	"net-track GmbH"
+	CONTACT-INFO	"net-track GmbH
+			Duensstrasse 1
+			3186 Duedingen
+			Switzerland
+			www.net-track.ch"
+	DESCRIPTION	"Management Information for E3METER IPM products
+	    		www.e3meter.com"
+	REVISION	"201204120000Z"
+	DESCRIPTION	"Added import of TEXTUAL-CONVENTION."
+	REVISION	"201111020000Z"
+	DESCRIPTION	"Added channel type and channel groups."
+	REVISION	"201108190000Z"
+	DESCRIPTION	"Added e3IpmChannelName."
+	REVISION	"201101260000Z"
+	DESCRIPTION	"Corrected some syntax errors for very picky parsers."
+	REVISION	"201012060000Z"
+	DESCRIPTION	"Added sensor data."
+	REVISION	"201010200000Z"
+	DESCRIPTION	"Initial version of this MIB module."
+	::= { public 10 }
+
+e3Ipm OBJECT IDENTIFIER
+	::= { e3Mib 7 }
+
+-- ===========================================================================
+-- Textual conventions
+--
+
+Watts ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Watts"
+	SYNTAX		INTEGER
+
+VoltAmpereReactives ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere reactives"
+	SYNTAX		Integer32
+
+VoltAmperes ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-amperes"
+	SYNTAX		Integer32
+
+WattHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Watt hours"
+	SYNTAX		Integer32
+
+VoltAmpereReactiveHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere reactive hours"
+	SYNTAX		Integer32
+
+VoltAmpereHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere hours"
+	SYNTAX		Integer32
+
+MilliAmperes ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-amperes"
+	SYNTAX		Integer32
+
+MilliVolts ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-volts"
+	SYNTAX		Integer32
+
+MilliHertz ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-hertz"
+	SYNTAX		Integer32
+
+DeciDegreesCelsius ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Deci-degrees celsius"
+        SYNTAX		Integer32
+
+Permil ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Per mil"
+        SYNTAX		INTEGER
+
+-- ===========================================================================
+-- Agent information
+--
+
+e3IpmInfo OBJECT IDENTIFIER
+	::= { e3Ipm 1 }
+
+e3IpmInfoSerial OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Serial number."
+	::= { e3IpmInfo 1 }
+
+e3IpmInfoModel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Model number."
+	::= { e3IpmInfo 2 }
+
+e3IpmInfoHWVersion OBJECT-TYPE
+	SYNTAX		INTEGER {
+		rev-a (0),
+		rev-b (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Hardware revision."
+	::= { e3IpmInfo 3 }
+
+e3IpmInfoFWVersion OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Integer representation of the firmware revision
+		(major.minor) represented as a 16 bit integer."
+	::= { e3IpmInfo 4 }
+
+e3IpmInfoMeters OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of power meters in this IPS."
+	::= { e3IpmInfo 5 }
+
+-- ===========================================================================
+-- IPM meters
+--
+
+e3IpmMeterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmMeterTable holds information related to the
+		powermeters of all IPS nodes."
+	::= { e3Ipm 2 }
+
+e3IpmMeterEntry OBJECT-TYPE
+	SYNTAX		E3IpmMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific powermeter."
+	INDEX		{ e3IpmMeter }
+	::=		{ e3IpmMeterTable 1 }
+
+E3IpmMeterEntry ::= SEQUENCE {
+		e3IpmMeter	 Integer32,
+		e3IpmEnergyP	 WattHours,
+		e3IpmEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmEnergyS	 VoltAmpereHours,
+		e3IpmPowerP	 Watts,
+		e3IpmPowerQ	 VoltAmpereReactives,
+		e3IpmPowerS	 VoltAmperes,
+		e3IpmUrms        MilliVolts,
+		e3IpmIrms        MilliAmperes,
+		e3IpmFrequency   MilliHertz,
+		e3IpmChannelName OCTET STRING,
+		e3IpmChannelType INTEGER
+	}
+
+e3IpmMeter OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of the powermeter of this IPS."
+	::= { e3IpmMeterEntry 1 }
+
+e3IpmEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active energy in watt hours."
+	::= { e3IpmMeterEntry 2 }
+
+e3IpmEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive energy in volt-ampere reactives hours."
+	::= { e3IpmMeterEntry 3 }
+
+e3IpmEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Apparent energy in volt-ampere hours."
+	::= { e3IpmMeterEntry 4 }
+
+e3IpmPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active power at a given instant."
+	::= { e3IpmMeterEntry 5 }
+
+e3IpmPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive power at a given instant."
+	::= { e3IpmMeterEntry 6 }
+
+e3IpmPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Apparent power at a given instant."
+	::= { e3IpmMeterEntry 7 }
+
+e3IpmUrms OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS voltage at a given instant."
+	::= { e3IpmMeterEntry 8 }
+
+e3IpmIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS current at a given instant."
+	::= { e3IpmMeterEntry 9 }
+
+e3IpmFrequency OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Frequency measured a given instant."
+	::= { e3IpmMeterEntry 10 }
+
+e3IpmChannelName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel name."
+        ::= { e3IpmMeterEntry 11 }
+
+e3IpmChannelType OBJECT-TYPE
+        SYNTAX		INTEGER {
+		live-wire (0),
+		neutral-wire (1)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel type: For neutral wire channels, only I_rms will
+		contain meaningful values."
+	::= { e3IpmMeterEntry 12 }
+
+-- ===========================================================================
+-- IPM sensors
+--
+
+e3IpmSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmSensorTable holds information related to the
+		sensor of this IPM."
+	::= { e3Ipm 3 }
+
+e3IpmSensorEntry OBJECT-TYPE
+	SYNTAX		E3IpmSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific sensor."
+	INDEX		{ e3IpmSensor }
+	::=		{ e3IpmSensorTable 1 }
+
+E3IpmSensorEntry ::= SEQUENCE {
+		e3IpmSensor		Integer32,
+		e3IpmSensorType		INTEGER,
+		e3IpmSensorVersion	OCTET STRING,
+		e3IpmSensorTemperatureCelsius	DeciDegreesCelsius,
+		e3IpmSensorHumidity	Permil
+	}
+
+e3IpmSensor OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor port number."
+	::= { e3IpmSensorEntry 1 }
+
+e3IpmSensorType OBJECT-TYPE
+        SYNTAX		INTEGER {
+		none (0),
+		temp (1),
+		temp-humidity (2)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor type."
+	::= { e3IpmSensorEntry 2 }
+
+e3IpmSensorVersion OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Sensor version."
+        ::= { e3IpmSensorEntry 3 }
+
+e3IpmSensorTemperatureCelsius OBJECT-TYPE
+        SYNTAX          DeciDegreesCelsius
+        UNITS           "deg-C/10"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temperature in tenth degrees."
+        ::= { e3IpmSensorEntry 4 }
+
+e3IpmSensorHumidity OBJECT-TYPE
+        SYNTAX          Permil
+        UNITS           "/1000"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Relative humidity in per mil."
+        ::= { e3IpmSensorEntry 5 }
+
+-- ===========================================================================
+-- IPM predefined channel groups
+--
+
+e3IpmPGroupTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmPGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmPGroupTable holds information related to predefined
+		channel groups."
+	::= { e3Ipm 4 }
+
+e3IpmPGroupEntry OBJECT-TYPE
+	SYNTAX		E3IpmPGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific group."
+	INDEX		{ e3IpmPGroup }
+	::=		{ e3IpmPGroupTable 1 }
+
+E3IpmPGroupEntry ::= SEQUENCE {
+		e3IpmPGroup	 Integer32,
+		e3IpmPGName	 OCTET STRING,
+		e3IpmPGMembers	 Integer32,
+		e3IpmPGEnergyP	 WattHours,
+		e3IpmPGEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmPGEnergyS	 VoltAmpereHours,
+		e3IpmPGPowerP	 Watts,
+		e3IpmPGPowerQ	 VoltAmpereReactives,
+		e3IpmPGPowerS	 VoltAmperes,
+		e3IpmPGIrms      MilliAmperes
+	}
+
+e3IpmPGroup OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Predefined channel group number."
+	::= { e3IpmPGroupEntry 1 }
+
+e3IpmPGName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel group name."
+        ::= { e3IpmPGroupEntry 2 }
+
+e3IpmPGMembers OBJECT-TYPE
+        SYNTAX		Integer32
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"A bit set specifying the channels which are
+		members of this channel group. If bit 0 is set,
+		this means that channel CH1 is member of this
+		group. Bit 1 stands for CH2 and so on."
+        ::= { e3IpmPGroupEntry 3 }
+
+e3IpmPGEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active energy in watt hours."
+	::= { e3IpmPGroupEntry 4 }
+
+e3IpmPGEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive energy in volt-ampere reactives hours."
+	::= { e3IpmPGroupEntry 5 }
+
+e3IpmPGEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent energy in volt-ampere hours."
+	::= { e3IpmPGroupEntry 6 }
+
+e3IpmPGPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active power at a given instant."
+	::= { e3IpmPGroupEntry 7 }
+
+e3IpmPGPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive power at a given instant."
+	::= { e3IpmPGroupEntry 8 }
+
+e3IpmPGPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent power at a given instant."
+	::= { e3IpmPGroupEntry 9 }
+
+e3IpmPGIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group RMS current at a given instant."
+	::= { e3IpmPGroupEntry 10 }
+
+-- ===========================================================================
+-- IPM user defined channel groups
+--
+
+e3IpmUGroupTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmUGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmUGroupTable holds information related to user
+		defined channel groups."
+	::= { e3Ipm 5 }
+
+e3IpmUGroupEntry OBJECT-TYPE
+	SYNTAX		E3IpmUGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific group."
+	INDEX		{ e3IpmUGroup }
+	::=		{ e3IpmUGroupTable 1 }
+
+E3IpmUGroupEntry ::= SEQUENCE {
+		e3IpmUGroup	 Integer32,
+		e3IpmUGName	 OCTET STRING,
+		e3IpmUGMembers	 Integer32,
+		e3IpmUGEnergyP	 WattHours,
+		e3IpmUGEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmUGEnergyS	 VoltAmpereHours,
+		e3IpmUGPowerP	 Watts,
+		e3IpmUGPowerQ	 VoltAmpereReactives,
+		e3IpmUGPowerS	 VoltAmperes,
+		e3IpmUGIrms      MilliAmperes
+	}
+
+e3IpmUGroup OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"User defined channel group number."
+	::= { e3IpmUGroupEntry 1 }
+
+e3IpmUGName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel group name."
+        ::= { e3IpmUGroupEntry 2 }
+
+e3IpmUGMembers OBJECT-TYPE
+        SYNTAX		Integer32
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"A bit set specifying the channels which are
+		members of this channel group. If bit 0 is set,
+		this means that channel CH1 is member of this
+		group. Bit 1 stands for CH2 and so on. If no
+		members are configured, the group is inactive."
+        ::= { e3IpmUGroupEntry 3 }
+
+e3IpmUGEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active energy in watt hours."
+	::= { e3IpmUGroupEntry 4 }
+
+e3IpmUGEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive energy in volt-ampere reactives hours."
+	::= { e3IpmUGroupEntry 5 }
+
+e3IpmUGEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent energy in volt-ampere hours."
+	::= { e3IpmUGroupEntry 6 }
+
+e3IpmUGPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active power at a given instant."
+	::= { e3IpmUGroupEntry 7 }
+
+e3IpmUGPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive power at a given instant."
+	::= { e3IpmUGroupEntry 8 }
+
+e3IpmUGPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent power at a given instant."
+	::= { e3IpmUGroupEntry 9 }
+
+e3IpmUGIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group RMS current at a given instant."
+	::= { e3IpmUGroupEntry 10 }
+
+END

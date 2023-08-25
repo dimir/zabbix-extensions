@@ -1,0 +1,168 @@
+zabbix_export:
+  version: '6.4'
+  template_groups:
+    - uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    - uuid: ed0e24587cc542af95a88616aad11ebe
+      template: 'BlueNet BN2000 PDU'
+      name: 'BlueNet BN2000 PDU'
+      groups:
+        - name: 'Templates/Network devices'
+      items:
+        - uuid: e6daaa57a3c54f51b4129f894337db0c
+          name: 'Channel group active energy in watt hours'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGEnergyP.0'
+          key: channel.group.active.energy
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          units: Wh
+        - uuid: 776e06c57b5e4565ba5552f142fefe4b
+          name: 'Channel group active power at a given instant'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGPowerP.0'
+          key: channel.group.active.power
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          units: W
+        - uuid: c3cd840c340c42efac00020ab54154d7
+          name: 'Channel group apparent energy in volt-ampere hours'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGEnergyS.0'
+          key: channel.group.apparent.energy
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          units: VAh
+        - uuid: cbb13f96d69d4eb49a36f56d04c03f99
+          name: 'Channel group apparent power at a given instant'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGPowerS.0'
+          key: channel.group.apparent.power
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          units: VA
+        - uuid: 25018487bd1742289f7701c22e1d34f9
+          name: 'Channel group name'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGName.0'
+          key: channel.group.name
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '14400'
+        - uuid: a941a1a9af2f43c8820567e23849a59e
+          name: 'Channel group reactive energy in volt-ampere reactives hours (varh)'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGEnergyQ.0'
+          key: channel.group.reactive.energy
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          value_type: FLOAT
+          units: varh
+        - uuid: bc96688b76cc455bbf258f3668618bd0
+          name: 'Channel group reactive power at a given instant'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGPowerQ.0'
+          key: channel.group.reactive.power
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          value_type: FLOAT
+          units: var
+        - uuid: b215b35c10c54040bcc7a8655f15cca4
+          name: 'Channel group RMS current at a given instant'
+          type: SNMP_AGENT
+          snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPGIrms.0'
+          key: channel.group.rms.current
+          delay: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          units: mA
+      discovery_rules:
+        - uuid: 71e0cdf2de1f497aa8663a0111c4db30
+          name: 'Channel Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery["{#NAME}","NETTRACK-E3METER-SNMP-MIB::e3IpmChannelName"]'
+          key: ch.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#NAME}'
+                value: 'N'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          item_prototypes:
+            - uuid: 7924e7bea36543d3af4503fe7aec3d39
+              name: 'CH {#NAME}: Active energy in watt hours'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmEnergyP.{#SNMPINDEX}'
+              key: 'ch.active.energy[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: Wh
+            - uuid: 0a5ad838b03f41069da10b5ba243ed39
+              name: 'CH {#NAME}: Active power at a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPowerP.{#SNMPINDEX}'
+              key: 'ch.active.power[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: W
+            - uuid: 94ba26fae4ff4ba082e278e885dea75d
+              name: 'CH {#NAME}: Apparent energy in volt-ampere hours'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmEnergyS.{#SNMPINDEX}'
+              key: 'ch.apparent.energy[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: VAh
+            - uuid: 7255b006634a435e928e5a39bf3d0ca5
+              name: 'CH {#NAME}: Apparent power at a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPowerS.{#SNMPINDEX}'
+              key: 'ch.apparent.power[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: VA
+            - uuid: 356d6d3d2f40433bbbd13d864ffa383b
+              name: 'CH {#NAME}: Frequency measured a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency.{#SNMPINDEX}'
+              key: 'ch.frequency[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: mHz
+            - uuid: 0dfbebf49e8048f9a245d2cb3630fd1d
+              name: 'CH {#NAME}: Reactive energy in volt-ampere reactives hours (varh)'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmEnergyQ.{#SNMPINDEX}'
+              key: 'ch.reactive.energy[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              value_type: FLOAT
+              units: varh
+            - uuid: a558cead7db5477f892b280bb496f244
+              name: 'CH {#NAME}: Reactive power at a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmPowerQ.{#SNMPINDEX}'
+              key: 'ch.reactive.power[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              value_type: FLOAT
+              units: var
+            - uuid: 3e98cadca88e4ac6bdda9ba065d7b79c
+              name: 'CH {#NAME}: RMS current at a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmIrms.{#SNMPINDEX}'
+              key: 'ch.rms.current[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: mA
+            - uuid: 25b3d1c93bf24adeaea48bc594456d22
+              name: 'CH {#NAME}: RMS voltage at a given instant'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmUrms.{#SNMPINDEX}'
+              key: 'ch.rms.voltage[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: mV
+            - uuid: 38545c5f46b54a4cba124217aaf9d88f
+              name: 'CH {#NAME}: Temperature in tenth degrees'
+              type: SNMP_AGENT
+              snmp_oid: 'NETTRACK-E3METER-SNMP-MIB::e3IpmSensorTemperatureCelsius.{#SNMPINDEX}'
+              key: 'ch.temperature[{#NAME}]'
+              delay: '{$CHANNEL.UPDATE.INTERVAL}'
+              units: deg-C/10
+      macros:
+        - macro: '{$CHANNEL.GROUP.UPDATE.INTERVAL}'
+          value: 1m
+          description: 'How frequently to collect channel group metrics'
+        - macro: '{$CHANNEL.UPDATE.INTERVAL}'
+          value: 1m
+          description: 'How frequently to collect individual channel metrics'
