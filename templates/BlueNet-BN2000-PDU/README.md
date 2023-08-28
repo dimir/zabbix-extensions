@@ -17,3 +17,7 @@
 
     open Zabbix frontend, got to "Data collection -> Hosts" and add the host for your PDU, add SNMP interface
     open the host properties, "Templates" tab and link template "BlueNet BN2000 PDU" to it
+
+## Optionally review macros
+
+    optionally review template macros {$CHANNEL.UPDATE.INTERVAL} and {$CHANNEL.GROUP.UPDATE.INTERVAL}
