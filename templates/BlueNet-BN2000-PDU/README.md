@@ -15,5 +15,5 @@
 
 ## Link template
 
-    open Zabbix frontend, got to "Data collection -> Hosts" and add the host for your PDU, specify SNMP interface
+    open Zabbix frontend, got to "Data collection -> Hosts" and add the host for your PDU, add SNMP interface
     open the host properties, "Templates" tab and link template "BlueNet BN2000 PDU" to it
