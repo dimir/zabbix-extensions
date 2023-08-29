@@ -1,23 +1,23 @@
 # Zabbix template for BlueNet BN2000 PDU
 
-## Enable MIB support
+## Enable support for custom MIB files
 
-    follow these instructions: https://www.zabbix.com/documentation/current/en/manual/config/items/itemtypes/snmp/mibs
+Follow [these instructions](https://www.zabbix.com/documentation/current/en/manual/config/items/itemtypes/snmp/mibs).
 
-## Install MIBs
+## Install MIB files
 
-    copy BlueNet_BN2000.mib and SNMPv2-SMI.mib to /usr/local/share/snmp/mibs
-    restart Zabbix server
+    cp BlueNet_BN2000.mib SNMPv2-SMI.mib /usr/local/share/snmp/mibs
+	systemctl restart zabbix-server
 
-## Add template
+## Import template
 
-    open Zabbix frontend, go to "Data collection -> Templates" and import template BlueNet-BN2000-PDU.yaml
+Open Zabbix frontend, go to `Data collection -> Templates` and import template file `BlueNet-BN2000-PDU.yaml`.
 
 ## Link template
 
-    open Zabbix frontend, got to "Data collection -> Hosts" and add the host for your PDU, add SNMP interface
-    open the host properties, "Templates" tab and link template "BlueNet BN2000 PDU" to it
+1. Open Zabbix frontend, got to `Data collection -> Hosts` and create the host for your PDU, add SNMP interface.
+2. Click on the host, in the `Templates` section click `Select` and find template `BlueNet BN2000 PDU`. Click `Update`.
 
 ## Optionally review macros
 
-    optionally review template macros {$CHANNEL.UPDATE.INTERVAL} and {$CHANNEL.GROUP.UPDATE.INTERVAL}
+Optionally review template macros `{$CHANNEL.UPDATE.INTERVAL}` and `{$CHANNEL.GROUP.UPDATE.INTERVAL}`.
