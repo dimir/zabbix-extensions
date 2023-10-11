@@ -1,9 +1,6 @@
 # ["My Address"](./my-address/)
 
-This module demonstrates how to:
-
-  - create an Action and the View
-  - add menu element
+This module demonstrates how to add a new menu element that will display a custom web page.
 
 # ["Custom Items"](./customitems/)
 
