@@ -1,3 +1,5 @@
+Important! These modules should be working on Zabbix 6.4 and later.
+
 # ["My Address"](./my-address/)
 
 This module demonstrates how to add a new menu element that will display a custom web page.
