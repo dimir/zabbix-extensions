@@ -4,13 +4,7 @@ This module demonstrates how to add a new menu element that will display a custo
 
 # ["Custom Items"](./customitems/)
 
-This module demonstrates how to:
-
-  - fetch hosts and items using Zabbix PHP classes (that use Zabbix API)
-  - display data in an HTML table
-  - use multiselect HTML form element
-  - pass user data from multiselect to an action
-  - add menu element
+This module demonstrates how to fetch items of a specified host from Zabbix and display them on a custom web page.
 
 # Zabbix PHP classes documentation
 
