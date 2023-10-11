@@ -1,6 +1,7 @@
 main: clean
 	go mod init myip
-	GOPROXY=direct go mod tidy
+	GOPROXY=direct go get git.zabbix.com/ap/plugin-support@release/6.4
+	go mod tidy
 	go build
 
 .PHONY: install
