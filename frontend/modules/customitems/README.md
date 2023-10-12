@@ -1,6 +1,6 @@
 Important! This module should be working on Zabbix 6.4 and later.
 
-This module demonstrates how to create a web page where you want to display hosts/items in a different view. In detail, here you can see how to:
+This module demonstrates how to create a web page where you want to display hosts items in a different view. In detail, here you can see how to:
 
   - add new menu element that will point to the new page
   - display a list in an HTML table, using Zabbix items as an example

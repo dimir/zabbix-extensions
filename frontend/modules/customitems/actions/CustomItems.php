@@ -3,16 +3,17 @@
 namespace Modules\CustomItems\Actions;
 
 use API;
-use CArrayHelper;
 use CUrl;
+use CArrayHelper;
 use CPagerHelper;
-use CController;
 use CControllerResponseData;
 
-class CustomItems extends CController {
-
-	public function disableSIDvalidation() {
-		if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
+class CustomItems extends Base
+{
+	public function disableSIDvalidation()
+	{
+		if (version_compare(ZABBIX_VERSION, '6.4.0', '<'))
+		{
 			return parent::disableSIDvalidation();
 		}
 
@@ -29,8 +30,8 @@ class CustomItems extends CController {
 
     protected function checkInput() {
         $fields = [
-            'hostids'       => 'array_id',
-            'filter_rst'    => 'in 0,1'
+            'hostids'    => 'array_id',
+            'filter_rst' => 'in 0,1'
         ];
 
         $ret = $this->validateInput($fields);
@@ -55,21 +56,26 @@ class CustomItems extends CController {
             $data['hostids'] = null;
         }
         else if (is_array($data['hostids'])) {
-            $data['hosts_for_multiselect'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+			$params = [
                 'output'        => ['name', 'hostid'],
                 'hostids'       => array_unique($data['hostids']),
-                'preservekeys'  => true
-            ]), ['hostid' => 'id']);
+                'preservekeys'  => true,
+			];
+
+            $data['hosts_for_multiselect'] = CArrayHelper::renameObjectsKeys(API::Host()->get($params), ['hostid' => 'id']);
         }
 
-        $data['items'] = API::Item()->get([
-            'output' => $data['columns'],
-            'hostids' => $data['hostids']
-        ]);
+		$params = [
+			'output'  => $data['columns'],
+			'hostids' => $data['hostids'],
+			'limit'   => $this->searchLimit(),
+		];
+
+        $data['items'] = API::Item()->get($params);
 
         $response = new CControllerResponseData($data);
 
-        $response->setTitle('Custom Items');
+		$response->setTitle('HTML title: Custom Items');
 
         $this->setResponse($response);
     }

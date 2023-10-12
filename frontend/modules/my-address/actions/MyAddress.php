@@ -2,12 +2,6 @@
 
 namespace Modules\MyAddress\Actions;
 
-if (version_compare(ZABBIX_VERSION, '6.4.0', '>'))
-{
-	class_alias('\Zabbix\Core\CModule', '\Core\CModule');
-	class_alias('\CHtmlPage', '\CWidget');
-}
-
 use CControllerResponseData;
 use CController;
 
@@ -40,11 +34,11 @@ class MyAddress extends CController
 
 	protected function doAction(): void
 	{
-		$data = ['my-ip' => file_get_contents("https://api.ipify.org")];
+		$data = ['my-ip-data' => file_get_contents("https://api.ipify.org")];
 
 		$response = new CControllerResponseData($data);
 
-		$response->setTitle('My Address');
+		$response->setTitle('HTML title: My Address');
 
 		$this->setResponse($response);
 	}
